@@ -9,7 +9,24 @@
     <link rel="icon" type="image/png" href="https://emoji.dutl.uk/png/64x64/🇬🇧.png">
 </head>
 <style>
-    table, tr, td {border: 1px solid black;}
+    #app {
+        margin: auto;
+        max-width: fit-content;
+    }
+    td, th {
+        border-bottom: 1px solid darkgray; 
+        border-right: 1px solid darkgray;
+        padding: 0.2em;
+    }
+    td {
+        line-height: 1.6em;
+    }
+    * {
+        font-family: Helvetica;
+    }
+    a {
+        color: mediumblue;
+    }
 </style>
 <body>
 <div id="app">
@@ -36,10 +53,10 @@
         </tbody>
     </table>
     <p v-else>No data available</p>
+    <br><br>
+    <br><br>
+    <small>made by <a href="https://cemrekarakas.com/">cemre</a>.</small>
 </div>
-<br><br>
-<br><br>
-<small>made by <a href="https://cemrekarakas.com/">cemre</a>.</small>
 
 
     <script>
