@@ -10,10 +10,13 @@
     <link rel="icon" type="image/png" href="https://emoji.dutl.uk/png/64x64/🇬🇧.png">
 </head>
 <style>
+    body {
+        margin: 0;
+    }
     td, th {
         border-bottom: 1px solid darkgray; 
         border-right: 1px solid darkgray;
-        padding: 0.2em;
+        padding: 0.3em;
     }
     td {
         line-height: 1.6em;
@@ -24,18 +27,36 @@
     .spinner {
         display: inline-block;
     }
-    td > div {
+    td > div, th > div {
         min-height: 1.5em;
         width: 10em;
     }
     td:first-child {
         width: 18em;
     }
+    .navigation {
+        background-color: #fff5ae;
+        padding: 1em;
+    }
+    #app {
+        margin: 1em;
+    }
+    .searchLinks {
+        width: 5em;
+    }
+    .pageNavigation {
+        text-align: right;
+    }
+    .tableDiv {
+        width: fit-content;
+    }
 </style>
 <body>
-<div id="app">
+<div class="navigation">
     <h1>UK Tier-2 Sponsors</h1>
-    
+    <p>Simple lightweight explorer to browse companies in the UK licensed to sponsor Tier-2 (Skilled Worker) visas.</p>
+</div>
+<div id="app">
     <input type="text" v-model="searchQuery" placeholder="Search...">
     <button @click="fetchData" :disabled="loading">Search</button>
     <br>
@@ -44,28 +65,37 @@
         Loading...
     </div>
     
-    <table v-if="filteredData.length">
-        <thead>
-            <tr>
-                <th v-for="header in headers" :key="header">{{ header }}</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr v-for="row in filteredData" :key="row['Organisation Name']">
-                <td v-for="header in headers" :key="header"><div>{{ row[header] }}</div></td>
-            </tr>
-        </tbody>
-    </table>
-    <p v-else>No data available</p>
+    <div class="tableDiv">
+        <table v-if="filteredData.length">
+            <thead>
+                <tr>
+                    <th v-for="header in headers" :key="header"><div>{{ header }}</div></th>
+                    <th><div class='searchLinks'>Search</div></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="row in filteredData" :key="row['Organisation Name']">
+                    <td v-for="header in headers" :key="header"><div>{{ row[header] }}</div></td>
+                    <td>
+                        <a v-bind:href="'https://google.com/search?q=' + row['Organisation Name']" target="_blank"><img height="16" width="16" itemprop="url" alt="Google Icon" src="https://www.gstatic.com/devrel-devsite/prod/vb33e12289bba8e69a7a2381ed0b330f48e3451c31f78602f030bd1a47c2a4e59/developers/images/favicon-new.png"></a>
+                        <a v-bind:href="'https://www.linkedin.com/search/results/companies/?keywords=' + row['Organisation Name']" target="_blank"><img height="16" width="16" itemprop="url" alt="LinkedIn Icon" src="https://support.ndigital.com/file-asset/LI32x32_1png?v=1"></a>
+                        <a v-bind:href="'https://find-and-update.company-information.service.gov.uk/search?q=' + row['Organisation Name']" target="_blank"><img height="16" width="16" itemprop="url" alt="GOVUK Icon" src="https://www.gov.uk/assets/static/favicon-f54816fc15997bd42cd90e4c50b896a1fc098c0c32957d4e5effbfa9f9b35e53.ico"></a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <p v-else>No data available</p>
     
-    <br><br>
-    <!-- Pagination controls -->
-    <span>{{ currentPage }} / {{ totalPages }}</span>
-    <button @click="previousPage" :disabled="currentPage === 1">Previous Page</button>
-    <button @click="nextPage" :disabled="data.length < itemsPerPage">Next Page</button>
-
-    <br><br>
-    <br><br>
+        <br>
+        <!-- Pagination controls -->
+        <div class='pageNavigation'>
+            <span>{{ currentPage }} / {{ totalPages }}</span>
+            <button @click="previousPage" :disabled="currentPage === 1">Previous Page</button>
+            <button @click="nextPage" :disabled="data.length < itemsPerPage">Next Page</button>
+        </div>
+    </div>
+    <br>
+    <br>
     <small>made by <a href="https://cemrekarakas.com/">cemre</a>.</small>
 </div>
 
@@ -85,9 +115,6 @@
             },
             computed: {
                 filteredData() {
-                    if (!this.searchQuery) {
-                        return {}
-                    }
                     console.log("2 data", this.data.length)
                     // return this.data;
                     
@@ -111,7 +138,7 @@
                                     return String(row[key]).toLowerCase().includes(this.searchQuery.toLowerCase());
                                 });
                             });
-                            this.totalPages = Math.ceil(this.data.length / this.itemsPerPage);
+                            this.totalPages = Math.ceil(this.data.length / this.itemsPerPage) || 1;
                             this.loading = false;
                         }
                     });
