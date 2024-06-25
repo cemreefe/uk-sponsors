@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,13 +21,23 @@
     a {
         color: mediumblue;
     }
+    .spinner {
+        display: inline-block;
+    }
+    td > div {
+        min-height: 1.5em;
+        width: 10em;
+    }
+    td:first-child {
+        width: 18em;
+    }
 </style>
 <body>
 <div id="app">
     <h1>UK Tier-2 Sponsors</h1>
     
     <input type="text" v-model="searchQuery" placeholder="Search...">
-    <button @click="fetchData">Search</button>
+    <button @click="fetchData" :disabled="loading">Search</button>
     <br>
     <br>
     <div v-if="loading" class="spinner">
@@ -41,11 +52,18 @@
         </thead>
         <tbody>
             <tr v-for="row in filteredData" :key="row['Organisation Name']">
-                <td v-for="header in headers" :key="header">{{ row[header] }}</td>
+                <td v-for="header in headers" :key="header"><div>{{ row[header] }}</div></td>
             </tr>
         </tbody>
     </table>
     <p v-else>No data available</p>
+    
+    <br><br>
+    <!-- Pagination controls -->
+    <span>{{ currentPage }} / {{ totalPages }}</span>
+    <button @click="previousPage" :disabled="currentPage === 1">Previous Page</button>
+    <button @click="nextPage" :disabled="data.length < itemsPerPage">Next Page</button>
+
     <br><br>
     <br><br>
     <small>made by <a href="https://cemrekarakas.com/">cemre</a>.</small>
@@ -61,35 +79,80 @@
                 headers: [],
                 searchQuery: '',
                 loading: false,
+                currentPage: 1,
+                totalPages: 1,
+                itemsPerPage: 30,
             },
             computed: {
                 filteredData() {
                     if (!this.searchQuery) {
                         return {}
                     }
-                    return this.data;
+                    console.log("2 data", this.data.length)
+                    // return this.data;
+                    
+                    // Pagination logic
+                    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+                    return this.data.slice(startIndex, startIndex + this.itemsPerPage);
                 }
             },
             methods: {
                 fetchData() {
                     this.loading = true; // Set loading to true before fetching data
+                    this.currentPage = 1;
                     Papa.parse(this.csvUrl, {
                         download: true,
                         header: true,
                         complete: (results) => {
+                            this.headers = results.meta.fields;
                             this.data = results.data;
                             this.data = this.data.filter(row => {
                                 return Object.keys(row).some(key => {
                                     return String(row[key]).toLowerCase().includes(this.searchQuery.toLowerCase());
                                 });
                             });
-                            this.headers = results.meta.fields;
-                            this.loading = false; // Set loading to false after data is fetched
-
+                            this.totalPages = Math.ceil(this.data.length / this.itemsPerPage);
+                            this.loading = false;
                         }
                     });
+                },
+                nextPage() {
+                    this.currentPage++;
+                },
+                previousPage() {
+                    if (this.currentPage > 1) {
+                        this.currentPage--;
+                    }
+                },
+            },
+            created() {
+                // Fetch initial data based on URL parameters
+                const params = new URLSearchParams(window.location.search);
+                if (params.has('search')) {
+                    this.searchQuery = params.get('search');
                 }
-            }
+                this.fetchData();
+                if (params.has('page')) {
+                    this.currentPage = parseInt(params.get('page'));
+                }
+            },
+            watch: {
+                // Watch for changes in currentPage and searchQuery to update URL
+                currentPage(newPage) {
+                    const params = new URLSearchParams(window.location.search);
+                    params.set('page', newPage);
+                    window.history.replaceState({}, '', `${window.location.pathname}?${params}`);
+                },
+                searchQuery(newQuery) {
+                    const params = new URLSearchParams(window.location.search);
+                    if (newQuery.trim() === '') {
+                        params.delete('search');
+                    } else {
+                        params.set('search', newQuery);
+                    }
+                    window.history.replaceState({}, '', `${window.location.pathname}?${params}`);
+                }
+            },
         });
     </script>
 </body>
