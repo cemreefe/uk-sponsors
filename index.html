@@ -115,9 +115,6 @@
             },
             computed: {
                 filteredData() {
-                    console.log("2 data", this.data.length)
-                    // return this.data;
-                    
                     // Pagination logic
                     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
                     return this.data.slice(startIndex, startIndex + this.itemsPerPage);
@@ -167,14 +164,20 @@
                 // Watch for changes in currentPage and searchQuery to update URL
                 currentPage(newPage) {
                     const params = new URLSearchParams(window.location.search);
-                    params.set('page', newPage);
+                    if (newPage == 1){
+                        params.delete('page');
+                    }
+                    else {
+                        params.set('page', newPage);
+                    }
                     window.history.replaceState({}, '', `${window.location.pathname}?${params}`);
                 },
                 searchQuery(newQuery) {
                     const params = new URLSearchParams(window.location.search);
                     if (newQuery.trim() === '') {
                         params.delete('search');
-                    } else {
+                    } 
+                    else {
                         params.set('search', newQuery);
                     }
                     window.history.replaceState({}, '', `${window.location.pathname}?${params}`);
