@@ -130,13 +130,13 @@ body {
                     <td v-for="header in headers" :key="header"><div>{{ row[header] }}</div></td>
                     <td>
                         <a v-bind:href="'https://google.com/search?q=' + row['Organisation Name']" target="_blank">
-                            <img class='socialSearchIcon' itemprop="url" alt="Google Icon" src="https://www.gstatic.com/devrel-devsite/prod/vb33e12289bba8e69a7a2381ed0b330f48e3451c31f78602f030bd1a47c2a4e59/developers/images/favicon-new.png">
-                        </a>
-                        <a v-bind:href="'https://www.linkedin.com/search/results/companies/?keywords=' + row['Organisation Name']" target="_blank">
-                            <img class='socialSearchIcon' itemprop="url" alt="LinkedIn Icon" src="https://support.ndigital.com/file-asset/LI32x32_1png?v=1">
+                            <img class='socialSearchIcon' itemprop="url" alt="Google Icon" src="static/favicon-google.png">
                         </a>
                         <a v-bind:href="'https://find-and-update.company-information.service.gov.uk/search?q=' + row['Organisation Name']" target="_blank">
-                            <img class='socialSearchIcon' itemprop="url" alt="GOVUK Icon" src="https://www.gov.uk/assets/static/favicon-f54816fc15997bd42cd90e4c50b896a1fc098c0c32957d4e5effbfa9f9b35e53.ico">
+                            <img class='socialSearchIcon' itemprop="url" alt="GOVUK Icon" src="static/favicon-govuk.ico">
+                        </a>
+                        <a v-bind:href="'https://www.linkedin.com/search/results/companies/?keywords=' + row['Organisation Name']" target="_blank">
+                            <img class='socialSearchIcon' itemprop="url" alt="LinkedIn Icon" src="static/favicon-linkedin.webp">
                         </a>
                     </td>
                 </tr>
