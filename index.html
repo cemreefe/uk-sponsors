@@ -112,14 +112,14 @@ body {
 </div>
 <div id="app">
     <input type="text" v-model="searchQuery" placeholder="Search..." ref="searchInput">
-    <button @click="fetchData" :disabled="loading">Search</button>
+    <!-- <button @click="fetchData" :disabled="loading">Search</button> -->
     <div v-if="loading" class="spinner rotatingElement">
         ⏳
     </div>
     <br>
     <br>
     <div class="tableDiv">
-        <table v-if="filteredData.length">
+        <table v-if="paginatedData.length">
             <thead>
                 <tr>
                     <th v-for="header in headers" :key="header"><div>{{ header }}</div></th>
@@ -127,7 +127,7 @@ body {
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="row in filteredData" :key="row['Organisation Name']">
+                <tr v-for="row in paginatedData" :key="row['Organisation Name']">
                     <td v-for="header in headers" :key="header"><div>{{ row[header] }}</div></td>
                     <td>
                         <a v-bind:href="'https://google.com/search?q=' + row['Organisation Name']" target="_blank">
@@ -149,7 +149,7 @@ body {
         <!-- Pagination controls -->
         <div class='pageNavigation'>
             <button @click="previousPage" :disabled="currentPage === 1">Previous Page</button>
-            <button @click="nextPage" :disabled="data.length < itemsPerPage">Next Page</button>
+            <button @click="nextPage" :disabled="filteredData.length < itemsPerPage">Next Page</button>
             <span>{{ currentPage }} / {{ totalPages }}</span>
         </div>
     </div>
@@ -168,44 +168,42 @@ body {
                 headers: [],
                 searchQuery: '',
                 loading: false,
+                initPage: false,
                 currentPage: 1,
                 totalPages: 1,
                 itemsPerPage: 30,
             },
             computed: {
                 filteredData() {
-                    // Pagination logic
+                    if (this.initPage) {
+                        this.currentPage = this.initPage;
+                        this.initPage = false;
+                    }
+                    else {
+                        this.currentPage = 1;
+                    }
+                    _filteredData = this.data.filter(row => {
+                                return Object.keys(row).some(key => {
+                                    return String(row[key]).toLowerCase().includes(this.searchQuery.toLowerCase());
+                                });
+                            });
+                    this.totalPages = Math.ceil(_filteredData.length / this.itemsPerPage) || 1;
+                    return _filteredData;
+                },
+                paginatedData() {
                     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-                    return this.data.slice(startIndex, startIndex + this.itemsPerPage);
+                    return this.filteredData.slice(startIndex, startIndex + this.itemsPerPage);
                 }
             },
             methods: {
-                updateQueryString() {
-                    const params = new URLSearchParams(window.location.search);
-                    if (this.searchQuery.trim() === '') {
-                        params.delete('search');
-                    } 
-                    else {
-                        params.set('search', this.searchQuery);
-                    }
-                    window.history.replaceState({}, '', `${window.location.pathname}?${params}`);
-                },
                 fetchData() {
-                    this.updateQueryString();
                     this.loading = true; // Set loading to true before fetching data
-                    this.currentPage = 1;
                     Papa.parse(this.csvUrl, {
                         download: true,
                         header: true,
                         complete: (results) => {
                             this.headers = results.meta.fields;
                             this.data = results.data;
-                            this.data = this.data.filter(row => {
-                                return Object.keys(row).some(key => {
-                                    return String(row[key]).toLowerCase().includes(this.searchQuery.toLowerCase());
-                                });
-                            });
-                            this.totalPages = Math.ceil(this.data.length / this.itemsPerPage) || 1;
                             this.loading = false;
                         }
                     });
@@ -217,22 +215,17 @@ body {
                     if (this.currentPage > 1) {
                         this.currentPage--;
                     }
-                },
-                handleKeyPress(event) {
-                    if (event.key === 'Enter') {
-                        this.fetchData();
-                    }
-                },
+                }
             },
             created() {
                 // Fetch initial data based on URL parameters
+                this.fetchData();
                 const params = new URLSearchParams(window.location.search);
                 if (params.has('search')) {
                     this.searchQuery = params.get('search');
                 }
-                this.fetchData();
                 if (params.has('page')) {
-                    this.currentPage = parseInt(params.get('page'));
+                    this.initPage = parseInt(params.get('page'));
                 }
             },
             watch: {
@@ -246,11 +239,17 @@ body {
                         params.set('page', newPage);
                     }
                     window.history.replaceState({}, '', `${window.location.pathname}?${params}`);
-                }
-            },
-            mounted() {
-                // Add event listener to the input field
-                this.$refs.searchInput.addEventListener('keydown', this.handleKeyPress);
+                },
+                searchQuery(newQuery) {
+                    const params = new URLSearchParams(window.location.search);
+                    if (newQuery.trim() === '') {
+                        params.delete('search');
+                    } 
+                    else {
+                        params.set('search', newQuery);
+                    }
+                    window.history.replaceState({}, '', `${window.location.pathname}?${params}`);
+                },
             },
         });
     </script>
