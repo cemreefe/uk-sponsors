@@ -76,16 +76,22 @@ body {
         0% {
             transform: rotate(0deg);
         }
+        25% {
+            transform: rotate(180deg);
+        }
         50% {
             transform: rotate(180deg);
         }
+        75% {
+            transform: rotate(360deg);
+        }
         100% {
-            transform: rotate(180deg);
+            transform: rotate(360deg);
         }
     }
     
     .rotatingElement {
-        animation: rotateAndPause 2s infinite;
+        animation: rotateAndPause 3s infinite;
     }
     
     @media (min-width: 600px) {
