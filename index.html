@@ -150,6 +150,16 @@ body {
                 }
             },
             methods: {
+                updateQueryString() {
+                    const params = new URLSearchParams(window.location.search);
+                    if (this.searchQuery.trim() === '') {
+                        params.delete('search');
+                    } 
+                    else {
+                        params.set('search', this.searchQuery);
+                    }
+                    window.history.replaceState({}, '', `${window.location.pathname}?${params}`);
+                },
                 fetchData() {
                     this.loading = true; // Set loading to true before fetching data
                     this.currentPage = 1;
@@ -166,6 +176,7 @@ body {
                             });
                             this.totalPages = Math.ceil(this.data.length / this.itemsPerPage) || 1;
                             this.loading = false;
+                            this.updateQueryString();
                         }
                     });
                 },
@@ -203,16 +214,6 @@ body {
                     }
                     else {
                         params.set('page', newPage);
-                    }
-                    window.history.replaceState({}, '', `${window.location.pathname}?${params}`);
-                },
-                searchQuery(newQuery) {
-                    const params = new URLSearchParams(window.location.search);
-                    if (newQuery.trim() === '') {
-                        params.delete('search');
-                    } 
-                    else {
-                        params.set('search', newQuery);
                     }
                     window.history.replaceState({}, '', `${window.location.pathname}?${params}`);
                 }
