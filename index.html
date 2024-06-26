@@ -112,7 +112,6 @@ body {
 </div>
 <div id="app">
     <input type="text" v-model="searchQuery" placeholder="Search..." ref="searchInput">
-    <!-- <button @click="fetchData" :disabled="loading">Search</button> -->
     <div v-if="loading" class="spinner rotatingElement">
         ⏳
     </div>
@@ -160,11 +159,20 @@ body {
 
 
     <script>
+        function sleep(milliseconds) {
+            var start = new Date().getTime();
+            for (var i = 0; i < 1e7; i++) {
+                if ((new Date().getTime() - start) > milliseconds){
+                break;
+                }
+            }
+        }
         new Vue({
             el: '#app',
             data: {
                 csvUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vROQy0MGH2T6DQSzj7o8ws4o_XUQjmhf7BOY6fTrQzCJ05GmCvV0iz-9B8NMzxX5hM9ti9UQESToM3R/pub?single=true&output=csv',
-                data: [],
+                allData: [],
+                filteredData: [],
                 headers: [],
                 searchQuery: '',
                 loading: false,
@@ -172,24 +180,9 @@ body {
                 currentPage: 1,
                 totalPages: 1,
                 itemsPerPage: 30,
+                _refreshCompute: 0,
             },
             computed: {
-                filteredData() {
-                    if (this.initPage) {
-                        this.currentPage = this.initPage;
-                        this.initPage = false;
-                    }
-                    else {
-                        this.currentPage = 1;
-                    }
-                    _filteredData = this.data.filter(row => {
-                                return Object.keys(row).some(key => {
-                                    return String(row[key]).toLowerCase().includes(this.searchQuery.toLowerCase());
-                                });
-                            });
-                    this.totalPages = Math.ceil(_filteredData.length / this.itemsPerPage) || 1;
-                    return _filteredData;
-                },
                 paginatedData() {
                     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
                     return this.filteredData.slice(startIndex, startIndex + this.itemsPerPage);
@@ -203,10 +196,33 @@ body {
                         header: true,
                         complete: (results) => {
                             this.headers = results.meta.fields;
-                            this.data = results.data;
+                            this.allData = results.data;
                             this.loading = false;
+                            this.filterDataAsync();
                         }
                     });
+                },
+                async filterDataAsync() {
+                    if (this.allData.length == 0) {
+                        return;
+                    }
+                    _searchQuery = this.searchQuery;
+                    if (this.initPage) {
+                        this.currentPage = this.initPage;
+                        this.initPage = false;
+                    }
+                    else {
+                        this.currentPage = 1;
+                    }
+                    this.filteredData = this.allData.filter(row => {
+                            return Object.keys(row).some(key => {
+                                return String(row[key]).toLowerCase().includes(this.searchQuery.toLowerCase());
+                            });
+                        });
+                    this.totalPages = Math.ceil(this.filteredData.length / this.itemsPerPage) || 1;
+                    if (_searchQuery !== this.searchQuery) {
+                        this.filterDataAsync()
+                    }
                 },
                 nextPage() {
                     this.currentPage++;
@@ -241,6 +257,7 @@ body {
                     window.history.replaceState({}, '', `${window.location.pathname}?${params}`);
                 },
                 searchQuery(newQuery) {
+                    this.filterDataAsync();
                     const params = new URLSearchParams(window.location.search);
                     if (newQuery.trim() === '') {
                         params.delete('search');
