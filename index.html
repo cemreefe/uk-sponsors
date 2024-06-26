@@ -86,7 +86,7 @@ body {
     <p>Simple lightweight explorer to browse companies in the UK licensed to sponsor Tier-2 (Skilled Worker) visas.</p>
 </div>
 <div id="app">
-    <input type="text" v-model="searchQuery" placeholder="Search...">
+    <input type="text" v-model="searchQuery" placeholder="Search..." ref="searchInput">
     <button @click="fetchData" :disabled="loading">Search</button>
     <br>
     <br>
