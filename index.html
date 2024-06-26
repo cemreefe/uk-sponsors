@@ -32,6 +32,7 @@ body {
     
     .spinner {
         display: inline-block;
+        margin-left: 1em;
     }
     
     td > div, th > div {
@@ -70,6 +71,22 @@ body {
         width: 1em;
         margin-left: 0.3em;
     }
+
+    @keyframes rotateAndPause {
+        0% {
+            transform: rotate(0deg);
+        }
+        50% {
+            transform: rotate(180deg);
+        }
+        100% {
+            transform: rotate(180deg);
+        }
+    }
+    
+    .rotatingElement {
+        animation: rotateAndPause 2s infinite;
+    }
     
     @media (min-width: 600px) {
         td > div, th > div {
@@ -90,12 +107,10 @@ body {
 <div id="app">
     <input type="text" v-model="searchQuery" placeholder="Search..." ref="searchInput">
     <button @click="fetchData" :disabled="loading">Search</button>
-    <br>
-    <br>
-    <div v-if="loading" class="spinner">
-        Loading...
+    <div v-if="loading" class="spinner rotatingElement">
+        ⏳
     </div>
-    
+    <br>
     <div class="tableDiv">
         <table v-if="filteredData.length">
             <thead>
