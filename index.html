@@ -135,7 +135,8 @@ body {
                         <a v-bind:href="'https://find-and-update.company-information.service.gov.uk/search?q=' + row['Organisation Name']" target="_blank">
                             <img class='socialSearchIcon' itemprop="url" alt="GOVUK Icon" src="static/favicon-govuk.ico">
                         </a>
-                        <a v-bind:href="'https://www.linkedin.com/search/results/companies/?keywords=' + row['Organisation Name']" target="_blank">
+                        <!-- Search company  name on linkedin, filter by location == United Kingdom -->
+                        <a v-bind:href='"https://www.linkedin.com/search/results/companies/?companyHqGeo=%5B\"101165590\"%5D&keywords=" + row["Organisation Name"]' target="_blank">
                             <img class='socialSearchIcon' itemprop="url" alt="LinkedIn Icon" src="static/favicon-linkedin.webp">
                         </a>
                     </td>
