@@ -10,46 +10,74 @@
     <link rel="icon" type="image/png" href="https://emoji.dutl.uk/png/64x64/🇬🇧.png">
 </head>
 <style>
-    body {
+body {
         margin: 0;
+        font-family: Arial, sans-serif;
     }
+    
     td, th {
-        border-bottom: 1px solid darkgray; 
+        border-bottom: 1px solid darkgray;
         border-right: 1px solid darkgray;
         padding: 0.3em;
+        word-wrap: break-word;
     }
+    
     td {
         line-height: 1.6em;
     }
+    
     a {
         color: mediumblue;
     }
+    
     .spinner {
         display: inline-block;
     }
+    
     td > div, th > div {
         min-height: 1.5em;
-        width: 10em;
+        width: 100%;
     }
+    
     td:first-child {
-        width: 18em;
+        width: 100%;
     }
+    
     .navigation {
         background-color: #fff5ae;
         padding: 1em;
     }
+    
     #app {
         margin: 1em;
     }
+    
     .searchLinks {
         width: 5em;
     }
+    
     .pageNavigation {
-        text-align: right;
+        margin-top: 1em;
     }
+    
     .tableDiv {
-        width: fit-content;
+        overflow-x: auto;
     }
+    
+    @media (min-width: 600px) {
+        td > div, th > div {
+            width: 10em;
+        }
+        
+        td:first-child {
+            width: 18em;
+        }
+    
+        .pageNavigation {
+            text-align: right;
+        }
+    }
+
 </style>
 <body>
 <div class="navigation">
