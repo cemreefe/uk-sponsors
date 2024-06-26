@@ -130,9 +130,9 @@ body {
         <br>
         <!-- Pagination controls -->
         <div class='pageNavigation'>
-            <span>{{ currentPage }} / {{ totalPages }}</span>
             <button @click="previousPage" :disabled="currentPage === 1">Previous Page</button>
             <button @click="nextPage" :disabled="data.length < itemsPerPage">Next Page</button>
+            <span>{{ currentPage }} / {{ totalPages }}</span>
         </div>
     </div>
     <br>
